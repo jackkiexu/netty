@@ -19,6 +19,7 @@ package net.gleamynode.netty.channel.socket;
 
 import net.gleamynode.netty.channel.ChannelFactory;
 import net.gleamynode.netty.channel.ChannelPipeline;
+import org.apache.log4j.Logger;
 
 /**
  * @author The Netty Project (netty@googlegroups.com)
@@ -29,5 +30,6 @@ import net.gleamynode.netty.channel.ChannelPipeline;
  * @apiviz.has net.gleamynode.netty.channel.socket.ServerSocketChannel oneway - - creates
  */
 public interface ServerSocketChannelFactory extends ChannelFactory {
+
     ServerSocketChannel newChannel(ChannelPipeline pipeline);
 }

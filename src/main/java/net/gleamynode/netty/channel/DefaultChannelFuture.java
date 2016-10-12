@@ -21,8 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import lombok.Data;
 import net.gleamynode.netty.logging.Logger;
-
 
 public class DefaultChannelFuture implements ChannelFuture {
 
@@ -300,6 +300,7 @@ public class DefaultChannelFuture implements ChannelFuture {
         // There won't be any visibility problem or concurrent modification
         // because 'ready' flag will be checked against both addListener and
         // removeListener calls.
+        logger.info("firstListener:"+firstListener +", otherListeners:"+otherListeners);
         if (firstListener != null) {
             notifyListener(firstListener);
             firstListener = null;
@@ -322,5 +323,30 @@ public class DefaultChannelFuture implements ChannelFuture {
                     "An exception was thrown by " +
                     ChannelFutureListener.class.getSimpleName() + ".", t);
         }
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder result = new StringBuilder("DefaultChannelFuture{");
+        if(channel != null){
+            result.append("channel=" + channel.getClass());
+        }
+        if(channel != null){
+            result.append("channel=" + channel.getClass());
+        }
+        result.append(", cancellable=" + cancellable );
+        if(firstListener != null){
+            result.append("firstListener=" + firstListener.getClass());
+        }
+        if(otherListeners != null){
+            result.append("otherListeners=" + otherListeners.getClass());
+        }
+        result.append(", done=" + done +
+                ", cause=" + cause +
+                ", waiters=" + waiters +
+                '}')
+                ;
+
+        return result.toString();
     }
 }

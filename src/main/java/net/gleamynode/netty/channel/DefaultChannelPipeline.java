@@ -277,8 +277,7 @@ public class DefaultChannelPipeline implements ChannelPipeline {
         return null;
     }
 
-    public synchronized ChannelHandlerContext getContext(
-            Class<? extends ChannelHandler> handlerType) {
+    public synchronized ChannelHandlerContext getContext(Class<? extends ChannelHandler> handlerType) {
         if (name2ctx.isEmpty()) {
             return null;
         }

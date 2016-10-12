@@ -23,8 +23,11 @@ import net.gleamynode.netty.channel.ChannelPipeline;
 import net.gleamynode.netty.channel.ChannelSink;
 import net.gleamynode.netty.channel.socket.ServerSocketChannel;
 import net.gleamynode.netty.channel.socket.ServerSocketChannelFactory;
+import org.apache.log4j.Logger;
 
 public class NioServerSocketChannelFactory implements ServerSocketChannelFactory {
+
+    Logger logger = Logger.getLogger(getClass());
 
     final Executor bossExecutor;
     private final ChannelSink sink;
@@ -34,9 +37,9 @@ public class NioServerSocketChannelFactory implements ServerSocketChannelFactory
         this(bossExecutor, workerExecutor, Runtime.getRuntime().availableProcessors());
     }
 
-    public NioServerSocketChannelFactory(
-            Executor bossExecutor, Executor workerExecutor,
-            int workerCount) {
+    public NioServerSocketChannelFactory(Executor bossExecutor, Executor workerExecutor, int workerCount) {
+
+
         if (bossExecutor == null) {
             throw new NullPointerException("bossExecutor");
         }

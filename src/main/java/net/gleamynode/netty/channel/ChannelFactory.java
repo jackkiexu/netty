@@ -18,6 +18,8 @@
 package net.gleamynode.netty.channel;
 
 
+import org.apache.log4j.Logger;
+
 /**
  *
  * @author The Netty Project (netty@googlegroups.com)
@@ -29,5 +31,6 @@ package net.gleamynode.netty.channel;
  * @apiviz.has        net.gleamynode.netty.channel.Channel oneway - - creates
  */
 public interface ChannelFactory {
+
     Channel newChannel(ChannelPipeline pipeline);
 }

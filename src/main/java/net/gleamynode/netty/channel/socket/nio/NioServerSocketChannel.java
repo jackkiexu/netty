@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.ServerSocketChannel;
 
+import lombok.Data;
 import net.gleamynode.netty.channel.AbstractServerChannel;
 import net.gleamynode.netty.channel.ChannelException;
 import net.gleamynode.netty.channel.ChannelFactory;
@@ -32,7 +33,7 @@ import net.gleamynode.netty.channel.ChannelSink;
 import net.gleamynode.netty.channel.socket.DefaultServerSocketChannelConfig;
 import net.gleamynode.netty.channel.socket.ServerSocketChannelConfig;
 import net.gleamynode.netty.logging.Logger;
-
+@Data
 class NioServerSocketChannel extends AbstractServerChannel
                              implements net.gleamynode.netty.channel.socket.ServerSocketChannel {
 

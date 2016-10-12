@@ -23,6 +23,7 @@ import java.nio.channels.SocketChannel;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import lombok.Data;
 import net.gleamynode.netty.channel.AbstractChannel;
 import net.gleamynode.netty.channel.Channel;
 import net.gleamynode.netty.channel.ChannelFactory;

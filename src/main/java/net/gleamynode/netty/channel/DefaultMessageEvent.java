@@ -17,8 +17,11 @@
  */
 package net.gleamynode.netty.channel;
 
+import lombok.Data;
+
 import java.net.SocketAddress;
 
+@Data
 public class DefaultMessageEvent extends DefaultChannelEvent implements
         MessageEvent {
 

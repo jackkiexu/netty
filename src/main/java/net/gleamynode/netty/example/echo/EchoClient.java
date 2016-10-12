@@ -28,23 +28,12 @@ public class EchoClient {
 
     public static void main(String[] args) throws Exception {
         // Print usage if no argument is specified.
-        if (args.length < 2 || args.length > 3) {
-            System.err.println(
-                    "Usage: " + EchoClient.class.getSimpleName() +
-                    " <host> <port> [<first message size>]");
-            return;
-        }
+
 
         // Parse options.
-        String host = args[0];
-        int port = Integer.parseInt(args[1]);
-        int firstMessageSize;
-
-        if (args.length == 3) {
-            firstMessageSize = Integer.parseInt(args[2]);
-        } else {
-            firstMessageSize = 256;
-        }
+        String host = "127.0.0.1";
+        int port = 1297;
+        int firstMessageSize = 256;
 
         // Start client.
         ChannelFactory factory =

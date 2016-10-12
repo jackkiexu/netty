@@ -34,6 +34,8 @@ import net.gleamynode.netty.channel.SimpleChannelHandler;
 @ChannelPipelineCoverage("all")
 public class EchoHandler extends SimpleChannelHandler {
 
+    AtomicLong count = new AtomicLong(0);
+
     private static final Logger logger = Logger.getLogger(
             EchoHandler.class.getName());
 
@@ -71,14 +73,15 @@ public class EchoHandler extends SimpleChannelHandler {
     @Override
     public void channelConnected(
             ChannelHandlerContext ctx, ChannelStateEvent e) {
-        e.getChannel().write(firstMessage);
+        if(count.get() <= 10) e.getChannel().write(firstMessage);
     }
 
     @Override
-    public void messageReceived(
-            ChannelHandlerContext ctx, MessageEvent e) {
-        transferredBytes.addAndGet(((ChannelBuffer) e.getMessage()).readableBytes());
-        e.getChannel().write(e.getMessage());
+    public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) {
+        if(count.get() <= 10){
+            transferredBytes.addAndGet(((ChannelBuffer) e.getMessage()).readableBytes());
+            e.getChannel().write(e.getMessage());
+        }
     }
 
     @Override

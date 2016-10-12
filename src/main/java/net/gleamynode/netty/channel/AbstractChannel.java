@@ -79,16 +79,6 @@ public abstract class AbstractChannel implements Channel, Comparable<Channel> {
         return new FailedChannelFuture(this, new UnsupportedOperationException());
     }
 
-    @Override
-    public final int hashCode() {
-        return System.identityHashCode(this);
-    }
-
-    @Override
-    public final boolean equals(Object o) {
-        return this == o;
-    }
-
     public int compareTo(Channel o) {
         return System.identityHashCode(this) - System.identityHashCode(o);
     }
@@ -153,35 +143,4 @@ public abstract class AbstractChannel implements Channel, Comparable<Channel> {
         return Channels.write(this, message, remoteAddress);
     }
 
-    @Override
-    public String toString() {
-        if (strVal != null) {
-            return strVal;
-        }
-
-        StringBuilder buf = new StringBuilder(128);
-        buf.append(getClass().getSimpleName());
-        buf.append("(id: ");
-        buf.append(id.toString());
-
-        if (isConnected()) {
-            buf.append(", ");
-            if (getParent() == null) {
-                buf.append(getLocalAddress());
-                buf.append(" => ");
-                buf.append(getRemoteAddress());
-            } else {
-                buf.append(getRemoteAddress());
-                buf.append(" => ");
-                buf.append(getLocalAddress());
-            }
-        } else if (isBound()) {
-            buf.append(", ");
-            buf.append(getLocalAddress());
-        }
-
-        buf.append(')');
-
-        return strVal = buf.toString();
-    }
 }

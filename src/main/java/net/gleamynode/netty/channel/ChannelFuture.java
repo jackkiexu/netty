@@ -17,6 +17,8 @@
  */
 package net.gleamynode.netty.channel;
 
+import lombok.Data;
+
 import java.util.concurrent.TimeUnit;
 
 /**

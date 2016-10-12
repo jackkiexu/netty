@@ -22,6 +22,7 @@ import static net.gleamynode.netty.channel.Channels.*;
 import java.io.IOException;
 import java.nio.channels.SocketChannel;
 
+import lombok.Data;
 import net.gleamynode.netty.channel.ChannelException;
 import net.gleamynode.netty.channel.ChannelFactory;
 import net.gleamynode.netty.channel.ChannelFuture;
@@ -87,5 +88,17 @@ class NioClientSocketChannel extends NioSocketChannel {
             // worker never changes.
             throw new IllegalStateException("Should not reach here.");
         }
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder result =  new StringBuilder("NioClientSocketChannel{");
+        if(worker!= null){
+            result.append("worker=" + worker.getClass() + ",");
+        }
+        if(connectFuture!= null){
+            result.append("worker=" + connectFuture.getClass() + ",");
+        }
+       return result.append(", boundManually=" + boundManually).toString();
     }
 }

@@ -17,7 +17,9 @@
  */
 package net.gleamynode.netty.channel;
 
+import lombok.Data;
 
+@Data
 public class DefaultExceptionEvent extends DefaultChannelEvent implements
         ExceptionEvent {
 

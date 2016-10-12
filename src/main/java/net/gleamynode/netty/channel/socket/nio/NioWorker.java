@@ -30,14 +30,16 @@ import java.util.Set;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import lombok.Data;
 import net.gleamynode.netty.buffer.ChannelBuffer;
 import net.gleamynode.netty.buffer.ChannelBuffers;
 import net.gleamynode.netty.channel.Channel;
 import net.gleamynode.netty.channel.ChannelException;
 import net.gleamynode.netty.channel.ChannelFuture;
-import net.gleamynode.netty.logging.Logger;
 import net.gleamynode.netty.util.NamePreservingRunnable;
+import org.apache.log4j.Logger;
 
+@Data
 class NioWorker implements Runnable {
 
     private static final Logger logger = Logger.getLogger(NioWorker.class);
@@ -58,6 +60,7 @@ class NioWorker implements Runnable {
 
     void register(NioSocketChannel channel, ChannelFuture future) {
         boolean firstChannel = started.compareAndSet(false, true);
+        logger.info("register : " + channel + ", future:" + future +", started:"+started +", firstChannel:"+firstChannel);
         Selector selector;
         if (firstChannel) {
             try {
@@ -78,10 +81,11 @@ class NioWorker implements Runnable {
 
         if (firstChannel) {
             try {
-                channel.socket.register(selector, SelectionKey.OP_READ, channel);
+                SelectionKey selectionKey = channel.socket.register(selector, SelectionKey.OP_READ, channel);
                 if (future != null) {
                     future.setSuccess();
                 }
+                logger.info("channel :" + channel + " socket register selectionKey: " + selectionKey);
             } catch (ClosedChannelException e) {
                 future.setFailure(e);
                 throw new ChannelException(
@@ -127,13 +131,18 @@ class NioWorker implements Runnable {
 
         boolean shutdown = false;
         Selector selector = this.selector;
+
+        logger.info("NioWorker run");
         for (;;) {
             synchronized (selectorGuard) {
                 // This empty synchronization block prevents the selector
                 // from acquiring its lock.
             }
             try {
+                // select() blocks until at least one channel is ready for the events you registered for.
+                // select(long timeout) does the same as select() except it blocks for a maximum of timeout milliseconds (the parameter).
                 int selectedKeyCount = selector.select(500);
+                logger.info("NioWorker run selectedKeyCount :" + selectedKeyCount);
                 if (selectedKeyCount > 0) {
                     processSelectedKeys(selector.selectedKeys());
                 }
@@ -188,20 +197,24 @@ class NioWorker implements Runnable {
             i.remove();
 
             if (!k.isValid()) {
+                logger.info("k.isValid():"+k);
                 close(k);
                 continue;
             }
 
             if (k.isReadable()) {
+                logger.info("k.isReadable():"+k);
                 read(k);
             }
 
             if (!k.isValid()) {
+                logger.info("k.isValid():"+k);
                 close(k);
                 continue;
             }
 
             if (k.isWritable()) {
+                logger.info("k.isWritable():"+k);
                 write(k);
             }
         }
@@ -272,8 +285,7 @@ class NioWorker implements Runnable {
             // Set limitation for the number of written bytes for read-write
             // fairness.  I used maxReadBufferSize * 3 / 2, which yields best
             // performance in my experience while not breaking fairness much.
-            int previousReceiveBufferSize =
-                channel.getConfig().getReceiveBufferSizePredictor().nextReceiveBufferSize();
+            int previousReceiveBufferSize = channel.getConfig().getReceiveBufferSizePredictor().nextReceiveBufferSize();
             maxWrittenBytes = previousReceiveBufferSize + previousReceiveBufferSize >>> 1;
         } else {
             maxWrittenBytes = Integer.MAX_VALUE;

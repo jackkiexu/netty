@@ -35,13 +35,12 @@ import net.gleamynode.netty.channel.ChannelPipeline;
 import net.gleamynode.netty.channel.ChannelState;
 import net.gleamynode.netty.channel.ChannelStateEvent;
 import net.gleamynode.netty.channel.MessageEvent;
-import net.gleamynode.netty.logging.Logger;
 import net.gleamynode.netty.util.NamePreservingRunnable;
+import org.apache.log4j.Logger;
 
 class NioServerSocketPipelineSink extends AbstractChannelSink {
 
-    static final Logger logger =
-        Logger.getLogger(NioServerSocketPipelineSink.class);
+    static final Logger logger = Logger.getLogger(NioServerSocketPipelineSink.class);
     private static final AtomicInteger nextId = new AtomicInteger();
 
     private final int id = nextId.incrementAndGet();
@@ -55,8 +54,8 @@ class NioServerSocketPipelineSink extends AbstractChannelSink {
         }
     }
 
-    public void eventSunk(
-            ChannelPipeline pipeline, ChannelEvent e) throws Exception {
+    public void eventSunk(ChannelPipeline pipeline, ChannelEvent e) throws Exception {
+        logger.info("eventSunk :" + pipeline +", e:"+ e);
         Channel channel = e.getChannel();
         if (channel instanceof NioServerSocketChannel) {
             handleServerSocket(e);
@@ -66,17 +65,18 @@ class NioServerSocketPipelineSink extends AbstractChannelSink {
     }
 
     private void handleServerSocket(ChannelEvent e) {
+        logger.info("handleServerSocket:"+e);
         if (!(e instanceof ChannelStateEvent)) {
             return;
         }
 
         ChannelStateEvent event = (ChannelStateEvent) e;
-        NioServerSocketChannel channel =
-            (NioServerSocketChannel) event.getChannel();
+        NioServerSocketChannel channel = (NioServerSocketChannel) event.getChannel();
         ChannelFuture future = event.getFuture();
         ChannelState state = event.getState();
         Object value = event.getValue();
 
+        logger.info("channel:"+channel +", future:"+future +", value");
         switch (state) {
         case OPEN:
             if (Boolean.FALSE.equals(value)) {
@@ -94,6 +94,7 @@ class NioServerSocketPipelineSink extends AbstractChannelSink {
     }
 
     private void handleAcceptedSocket(ChannelEvent e) {
+        logger.info("handleAcceptedSocket e:" + e);
         if (e instanceof ChannelStateEvent) {
             ChannelStateEvent event = (ChannelStateEvent) e;
             NioSocketChannel channel = (NioSocketChannel) event.getChannel();
@@ -101,6 +102,7 @@ class NioServerSocketPipelineSink extends AbstractChannelSink {
             ChannelState state = event.getState();
             Object value = event.getValue();
 
+            logger.info("event:"+event +", channel:"+channel + ", future:"+future +", state:"+state + ", value:"+value);
             switch (state) {
             case OPEN:
                 if (Boolean.FALSE.equals(value)) {
@@ -120,6 +122,7 @@ class NioServerSocketPipelineSink extends AbstractChannelSink {
         } else if (e instanceof MessageEvent) {
             MessageEvent event = (MessageEvent) e;
             NioSocketChannel channel = (NioSocketChannel) event.getChannel();
+            logger.info("MessageEvent :" + e +", channel :" + channel);
             channel.writeBuffer.offer(event);
             NioWorker.write(channel);
         }
@@ -185,12 +188,18 @@ class NioServerSocketPipelineSink extends AbstractChannelSink {
         }
 
         public void run() {
+            logger.info("Boss run channel:"+channel);
             for (;;) {
                 try {
+
+                    // gather client request
+                    // the accept() method blocks until an incoming connection arrives
+                    logger.info("channel:"+ channel + " doing accept()");
                     SocketChannel acceptedSocket = channel.socket.accept();
+                    logger.info("channel:"+ channel + " doing accept() result : " + acceptedSocket);
                     try {
-                        ChannelPipeline pipeline =
-                            channel.getConfig().getPipelineFactory().getPipeline();
+
+                        ChannelPipeline pipeline = channel.getConfig().getPipelineFactory().getPipeline();
                         NioWorker worker = nextWorker();
                         worker.register(new NioAcceptedSocketChannel(
                                         channel.getFactory(), pipeline, channel,

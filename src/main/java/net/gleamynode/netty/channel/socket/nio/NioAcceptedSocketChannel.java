@@ -20,12 +20,14 @@ package net.gleamynode.netty.channel.socket.nio;
 import java.io.IOException;
 import java.nio.channels.SocketChannel;
 
+import lombok.Data;
 import net.gleamynode.netty.channel.Channel;
 import net.gleamynode.netty.channel.ChannelException;
 import net.gleamynode.netty.channel.ChannelFactory;
 import net.gleamynode.netty.channel.ChannelPipeline;
 import net.gleamynode.netty.channel.ChannelSink;
 
+@Data
 class NioAcceptedSocketChannel extends NioSocketChannel {
 
     final NioWorker worker;

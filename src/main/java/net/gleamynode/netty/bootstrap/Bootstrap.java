@@ -47,10 +47,10 @@ public class Bootstrap {
 
     private static Logger logger = Logger.getLogger(Bootstrap.class);
 
-    private volatile ChannelFactory factory;
-    private volatile ChannelPipeline pipeline = pipeline();
-    private volatile ChannelPipelineFactory pipelineFactory = pipelineFactory(pipeline);
-    private volatile Map<String, Object> options = new HashMap<String, Object>();
+    public volatile ChannelFactory factory;
+    public volatile ChannelPipeline pipeline = pipeline();
+    public volatile ChannelPipelineFactory pipelineFactory = pipelineFactory(pipeline);
+    public volatile Map<String, Object> options = new HashMap<String, Object>();
 
     public Bootstrap() {
         super();

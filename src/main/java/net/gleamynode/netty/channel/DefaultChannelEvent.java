@@ -17,6 +17,9 @@
  */
 package net.gleamynode.netty.channel;
 
+import lombok.Data;
+
+@Data
 public class DefaultChannelEvent implements ChannelEvent {
 
     private final Channel channel;
