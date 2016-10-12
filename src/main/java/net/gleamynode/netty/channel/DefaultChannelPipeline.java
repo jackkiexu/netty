@@ -443,6 +443,18 @@ public class DefaultChannelPipeline implements ChannelPipeline {
     }
 
 
+    @Override
+    public String toString() {
+        return "DefaultChannelPipeline{" +
+                "discardingSink=" + discardingSink +
+                ", channel=" + channel +
+                ", sink=" + sink +
+                ", head=" + head +
+                ", tail=" + tail +
+                ", name2ctx=" + name2ctx +
+                '}';
+    }
+
     private class DefaultChannelHandlerContext implements ChannelHandlerContext {
         volatile DefaultChannelHandlerContext next;
         volatile DefaultChannelHandlerContext prev;
@@ -568,4 +580,6 @@ public class DefaultChannelPipeline implements ChannelPipeline {
             return  result.toString();
         }
     }
+
+
 }

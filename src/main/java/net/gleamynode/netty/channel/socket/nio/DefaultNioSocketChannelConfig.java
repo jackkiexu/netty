@@ -19,9 +19,10 @@ package net.gleamynode.netty.channel.socket.nio;
 
 import java.net.Socket;
 
+import lombok.Data;
 import net.gleamynode.netty.channel.socket.DefaultSocketChannelConfig;
 import net.gleamynode.netty.util.ConvertUtil;
-
+@Data
 class DefaultNioSocketChannelConfig extends DefaultSocketChannelConfig
         implements NioSocketChannelConfig {
 

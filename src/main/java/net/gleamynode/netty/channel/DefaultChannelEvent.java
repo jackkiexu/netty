@@ -44,8 +44,4 @@ public class DefaultChannelEvent implements ChannelEvent {
         return future;
     }
 
-    @Override
-    public String toString() {
-        return channel.toString();
-    }
 }

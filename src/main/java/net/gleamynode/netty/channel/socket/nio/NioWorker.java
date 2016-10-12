@@ -94,6 +94,7 @@ class NioWorker implements Runnable {
             }
 
             boolean server = !(channel instanceof NioClientSocketChannel);
+            logger.info("channel:"+channel +", server:"+server);
             if (server) {
                 fireChannelOpen(channel);
             }

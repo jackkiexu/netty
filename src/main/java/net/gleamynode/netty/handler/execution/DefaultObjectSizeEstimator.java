@@ -25,9 +25,11 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import lombok.Data;
 import net.gleamynode.netty.buffer.ChannelBuffer;
 import net.gleamynode.netty.channel.MessageEvent;
 
+@Data
 public class DefaultObjectSizeEstimator implements ObjectSizeEstimator {
 
     private final ConcurrentMap<Class<?>, Integer> class2size =

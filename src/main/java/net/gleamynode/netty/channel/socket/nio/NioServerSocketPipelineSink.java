@@ -76,7 +76,7 @@ class NioServerSocketPipelineSink extends AbstractChannelSink {
         ChannelState state = event.getState();
         Object value = event.getValue();
 
-        logger.info("channel:"+channel +", future:"+future +", value");
+        logger.info("channel:"+channel +", future:"+future + ", state: " + state +", value:"+value);
         switch (state) {
         case OPEN:
             if (Boolean.FALSE.equals(value)) {
@@ -196,11 +196,13 @@ class NioServerSocketPipelineSink extends AbstractChannelSink {
                     // the accept() method blocks until an incoming connection arrives
                     logger.info("channel:"+ channel + " doing accept()");
                     SocketChannel acceptedSocket = channel.socket.accept();
-                    logger.info("channel:"+ channel + " doing accept() result : " + acceptedSocket);
+
                     try {
 
                         ChannelPipeline pipeline = channel.getConfig().getPipelineFactory().getPipeline();
+                        logger.info("channel:"+ channel + " doing accept() result : " + acceptedSocket + ", pipeline:" + pipeline);
                         NioWorker worker = nextWorker();
+                        logger.info("worker:"+worker);
                         worker.register(new NioAcceptedSocketChannel(
                                         channel.getFactory(), pipeline, channel,
                                         NioServerSocketPipelineSink.this,

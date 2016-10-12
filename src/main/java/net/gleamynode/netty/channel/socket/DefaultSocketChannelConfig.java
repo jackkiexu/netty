@@ -22,10 +22,12 @@ import java.net.SocketException;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import lombok.Data;
 import net.gleamynode.netty.channel.ChannelException;
 import net.gleamynode.netty.channel.ChannelPipelineFactory;
 import net.gleamynode.netty.util.ConvertUtil;
 
+@Data
 public class DefaultSocketChannelConfig implements SocketChannelConfig {
 
     private final Socket socket;

@@ -50,7 +50,7 @@ public class DefaultChannelStateEvent extends DefaultChannelEvent implements
     public String toString() {
         String parentString = super.toString();
         StringBuilder buf = new StringBuilder(parentString.length() + 64);
-        buf.append(parentString);
+        buf.append("DefaultChannelStateEvent :" + parentString);
         buf.append(" - (state: ");
         switch (getState()) {
         case OPEN:
@@ -97,4 +97,5 @@ public class DefaultChannelStateEvent extends DefaultChannelEvent implements
         buf.append(')');
         return buf.toString();
     }
+
 }
