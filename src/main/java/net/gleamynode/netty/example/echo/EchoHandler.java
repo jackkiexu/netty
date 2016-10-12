@@ -73,12 +73,16 @@ public class EchoHandler extends SimpleChannelHandler {
     @Override
     public void channelConnected(
             ChannelHandlerContext ctx, ChannelStateEvent e) {
-        if(count.get() <= 10) e.getChannel().write(firstMessage);
+        if(count.get() <= 5){
+            count.getAndIncrement();
+            e.getChannel().write(firstMessage);
+        }
     }
 
     @Override
     public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) {
-        if(count.get() <= 10){
+        if(count.get() <= 5){
+            count.getAndIncrement();
             transferredBytes.addAndGet(((ChannelBuffer) e.getMessage()).readableBytes());
             e.getChannel().write(e.getMessage());
         }

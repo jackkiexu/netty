@@ -194,6 +194,7 @@ class NioWorker implements Runnable {
     }
 
     private static void processSelectedKeys(Set<SelectionKey> selectedKeys) {
+        logger.info("processSelectedKeys:" + selectedKeys);
         for (Iterator<SelectionKey> i = selectedKeys.iterator(); i.hasNext();) {
             SelectionKey k = i.next();
             i.remove();
