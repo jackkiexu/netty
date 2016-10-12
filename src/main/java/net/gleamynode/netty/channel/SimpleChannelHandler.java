@@ -17,7 +17,7 @@
  */
 package net.gleamynode.netty.channel;
 
-import net.gleamynode.netty.logging.Logger;
+import org.apache.log4j.Logger;
 
 
 /**
@@ -32,9 +32,8 @@ public class SimpleChannelHandler implements ChannelUpstreamHandler {
     private static final Logger logger =
         Logger.getLogger(SimpleChannelHandler.class.getName());
 
-    public void handleUpstream(
-            ChannelHandlerContext ctx, ChannelEvent e) throws Exception {
-
+    public void handleUpstream(ChannelHandlerContext ctx, ChannelEvent e) throws Exception {
+        logger.info("handleUpstream ctx:"+ctx+", ChannelEvent:"+e);
         if (e instanceof MessageEvent) {
             messageReceived(ctx, (MessageEvent) e);
         } else if (e instanceof ChildChannelStateEvent) {

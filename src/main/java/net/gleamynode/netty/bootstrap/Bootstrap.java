@@ -33,7 +33,7 @@ import net.gleamynode.netty.channel.ChannelHandler;
 import net.gleamynode.netty.channel.ChannelPipeline;
 import net.gleamynode.netty.channel.ChannelPipelineFactory;
 import net.gleamynode.netty.channel.SimpleChannelHandler;
-import net.gleamynode.netty.logging.Logger;
+import org.apache.log4j.Logger;
 
 /**
  * @author The Netty Project (netty@googlegroups.com)
@@ -45,7 +45,7 @@ import net.gleamynode.netty.logging.Logger;
  */
 public class Bootstrap {
 
-    private static Logger logger = Logger.getLogger(Bootstrap.class);
+    protected static Logger logger = Logger.getLogger(Bootstrap.class);
 
     public volatile ChannelFactory factory;
     public volatile ChannelPipeline pipeline = pipeline();

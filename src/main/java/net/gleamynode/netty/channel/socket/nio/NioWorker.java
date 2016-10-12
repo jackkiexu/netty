@@ -53,6 +53,7 @@ class NioWorker implements Runnable {
     final Object selectorGuard = new Object();
 
     NioWorker(int bossId, int id, Executor executor) {
+        logger.info("init Worker bossId:" + bossId +", workerId:"+ id + ", Executor:"+executor);
         this.bossId = bossId;
         this.id = id;
         this.executor = executor;

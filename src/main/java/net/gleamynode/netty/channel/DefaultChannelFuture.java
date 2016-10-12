@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import lombok.Data;
-import net.gleamynode.netty.logging.Logger;
+import org.apache.log4j.Logger;
 
 public class DefaultChannelFuture implements ChannelFuture {
 
@@ -300,6 +300,11 @@ public class DefaultChannelFuture implements ChannelFuture {
         // There won't be any visibility problem or concurrent modification
         // because 'ready' flag will be checked against both addListener and
         // removeListener calls.
+        try {
+            new RuntimeException().printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         logger.info("firstListener:"+firstListener +", otherListeners:"+otherListeners);
         if (firstListener != null) {
             notifyListener(firstListener);

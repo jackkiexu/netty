@@ -20,7 +20,7 @@ package net.gleamynode.netty.channel;
 import java.util.concurrent.TimeUnit;
 
 import lombok.Data;
-import net.gleamynode.netty.logging.Logger;
+import org.apache.log4j.Logger;
 
 @Data
 public abstract class CompleteChannelFuture implements ChannelFuture {

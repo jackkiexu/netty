@@ -17,7 +17,7 @@
  */
 package net.gleamynode.netty.util;
 
-import net.gleamynode.netty.logging.Logger;
+import org.apache.log4j.Logger;
 
 public class NamePreservingRunnable implements Runnable {
     private static final Logger logger =

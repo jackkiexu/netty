@@ -32,7 +32,7 @@ import net.gleamynode.netty.channel.ChannelPipeline;
 import net.gleamynode.netty.channel.ChannelSink;
 import net.gleamynode.netty.channel.socket.DefaultServerSocketChannelConfig;
 import net.gleamynode.netty.channel.socket.ServerSocketChannelConfig;
-import net.gleamynode.netty.logging.Logger;
+import org.apache.log4j.Logger;
 @Data
 class NioServerSocketChannel extends AbstractServerChannel
                              implements net.gleamynode.netty.channel.socket.ServerSocketChannel {

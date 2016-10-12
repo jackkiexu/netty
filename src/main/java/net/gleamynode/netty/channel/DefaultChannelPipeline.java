@@ -25,7 +25,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-import net.gleamynode.netty.logging.Logger;
+import lombok.Data;
+import org.apache.log4j.Logger;
 
 
 public class DefaultChannelPipeline implements ChannelPipeline {
@@ -324,6 +325,7 @@ public class DefaultChannelPipeline implements ChannelPipeline {
     }
 
     void sendUpstream(DefaultChannelHandlerContext ctx, ChannelEvent e) {
+        logger.info("sendUpstream ctx:" + ctx + ", ChannelEvent : " + e);
         try {
             ((ChannelUpstreamHandler) ctx.getHandler()).handleUpstream(ctx, e);
         } catch (Throwable t) {
@@ -440,6 +442,7 @@ public class DefaultChannelPipeline implements ChannelPipeline {
         }
     }
 
+
     private class DefaultChannelHandlerContext implements ChannelHandlerContext {
         volatile DefaultChannelHandlerContext next;
         volatile DefaultChannelHandlerContext prev;
@@ -542,6 +545,27 @@ public class DefaultChannelPipeline implements ChannelPipeline {
             if (next != null) {
                 DefaultChannelPipeline.this.sendUpstream(next, e);
             }
+        }
+
+        @Override
+        public String toString() {
+            StringBuilder result =  new StringBuilder("DefaultChannelHandlerContext{");
+            if(next != null){
+                result.append("next:" + next.getName());
+            }
+
+            if(prev != null){
+                result.append("prev:" + prev.getName());
+            }
+
+            if(handler != null){
+                result.append("handler:" + handler.getClass());
+            }
+
+            result.append(", canHandleUpstream=" + canHandleUpstream +
+                    ", canHandleDownstream=" + canHandleDownstream +
+                    '}');
+            return  result.toString();
         }
     }
 }

@@ -39,6 +39,7 @@ import net.gleamynode.netty.channel.ChannelStateEvent;
 import net.gleamynode.netty.channel.ChildChannelStateEvent;
 import net.gleamynode.netty.channel.ExceptionEvent;
 import net.gleamynode.netty.channel.SimpleChannelHandler;
+import org.apache.log4j.Logger;
 
 /**
  * @author The Netty Project (netty@googlegroups.com)
@@ -113,6 +114,8 @@ public class ServerBootstrap extends Bootstrap {
     @ChannelPipelineCoverage("one")
     private final class Binder extends SimpleChannelHandler {
 
+        protected Logger logger = Logger.getLogger(Binder.class);
+
         private final SocketAddress localAddress;
         private final BlockingQueue<ChannelFuture> futureQueue;
         private final Map<String, Object> childOptions =
@@ -128,6 +131,8 @@ public class ServerBootstrap extends Bootstrap {
                 ChannelHandlerContext ctx,
                 ChannelStateEvent evt) {
             evt.getChannel().getConfig().setPipelineFactory(getPipelineFactory());
+
+            logger.info("channelOpen :" + ctx + ", evt:" + evt);
 
             // Split options into two categories: parent and child.
             Map<String, Object> allOptions = getOptions();

@@ -28,7 +28,7 @@ import net.gleamynode.netty.channel.ChannelFactory;
 import net.gleamynode.netty.channel.ChannelFuture;
 import net.gleamynode.netty.channel.ChannelPipeline;
 import net.gleamynode.netty.channel.ChannelSink;
-import net.gleamynode.netty.logging.Logger;
+import org.apache.log4j.Logger;
 
 class NioClientSocketChannel extends NioSocketChannel {
 

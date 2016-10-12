@@ -39,7 +39,7 @@ import net.gleamynode.netty.channel.ChannelPipeline;
 import net.gleamynode.netty.channel.ChannelState;
 import net.gleamynode.netty.channel.ChannelStateEvent;
 import net.gleamynode.netty.channel.MessageEvent;
-import net.gleamynode.netty.logging.Logger;
+import org.apache.log4j.Logger;
 import net.gleamynode.netty.util.NamePreservingRunnable;
 
 class NioClientSocketPipelineSink extends AbstractChannelSink {
