@@ -86,7 +86,7 @@ class NioWorker implements Runnable {
                 if (future != null) {
                     future.setSuccess();
                 }
-                logger.info("channel :" + channel + " socket register selectionKey: " + selectionKey);
+                logger.info("channel :" + channel + " socket register selectionKey: " + selectionKey.attachment().getClass());
             } catch (ClosedChannelException e) {
                 future.setFailure(e);
                 throw new ChannelException(
@@ -96,17 +96,25 @@ class NioWorker implements Runnable {
             boolean server = !(channel instanceof NioClientSocketChannel);
             logger.info("channel:"+channel +", server:"+server);
             if (server) {
+                logger.info("begin fireChannelOpen : " + channel);
                 fireChannelOpen(channel);
+                logger.info("end fireChannelOpen : " + channel);
             }
 
+            logger.info("begin fireChannelBound : " + channel);
             fireChannelBound(channel, channel.getLocalAddress());
+            logger.info("end fireChannelBound : " + channel);
+
+            logger.info("begin fireChannelConnected : " + channel);
             fireChannelConnected(channel, channel.getRemoteAddress());
+            logger.info("end fireChannelConnected : " + channel);
 
             String threadName =
                 (server ? "New I/O server worker #"
                         : "New I/O client worker #") + bossId + '-' + id;
 
             executor.execute(new NamePreservingRunnable(this, threadName));
+            logger.info("over NamePreservingRunnable : " + channel);
         } else {
             synchronized (selectorGuard) {
                 selector.wakeup();
@@ -276,6 +284,7 @@ class NioWorker implements Runnable {
     }
 
     static void write(NioSocketChannel channel) {
+        logger.info("write channel:"+channel);
         if (channel.writeBuffer.isEmpty() && channel.currentWriteEvent == null) {
             return;
         }
@@ -310,10 +319,12 @@ class NioWorker implements Runnable {
                 } else {
                     a = (ChannelBuffer) channel.currentWriteEvent.getMessage();
                 }
+                logger.info("ChannelBuffer a:"+a);
 
                 int localWrittenBytes = 0;
                 try {
                     for (int i = channel.getConfig().getWriteSpinCount(); i > 0; i --) {
+                        logger.info("write msg channel.currentWriteIndex:"+channel.currentWriteIndex);
                         localWrittenBytes = a.getBytes(
                             channel.currentWriteIndex,
                             channel.socket,
@@ -340,7 +351,7 @@ class NioWorker implements Runnable {
                 }
             }
         }
-
+        logger.info("addOpWrite:"+addOpWrite);
         if (addOpWrite) {
             setOpWrite(channel, true);
         } else if (removeOpWrite) {
@@ -349,6 +360,7 @@ class NioWorker implements Runnable {
     }
 
     private static void setOpWrite(NioSocketChannel channel, boolean opWrite) {
+        logger.info("setOpWrite : " + channel +", opWrite:"+opWrite);
         NioWorker worker = channel.getWorker();
         if (worker == null) {
             IllegalStateException cause =
@@ -358,7 +370,8 @@ class NioWorker implements Runnable {
         }
 
         Selector selector = worker.selector;
-        SelectionKey key = channel.socket.keyFor(selector);
+        SelectionKey key = channel.socket.keyFor(selector); // keyv maybe null
+        logger.info("keyFor(selector) : " + selector + ", key:"+key);
         if (!key.isValid()) {
             close(key);
             return;
@@ -404,7 +417,7 @@ class NioWorker implements Runnable {
                 }
             }
         }
-
+        logger.info("changed:"+changed);
         if (changed) {
             channel.setInterestOpsNow(interestOps);
             fireChannelInterestChanged(channel, interestOps);

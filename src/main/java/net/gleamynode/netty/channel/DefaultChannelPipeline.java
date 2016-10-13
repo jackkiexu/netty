@@ -334,6 +334,7 @@ public class DefaultChannelPipeline implements ChannelPipeline {
     }
 
     public void sendDownstream(ChannelEvent e) {
+        logger.info("sendDownstream e:" + e);
         DefaultChannelHandlerContext tail = getActualDownstreamContext(this.tail);
         if (tail == null) {
             try {
@@ -343,8 +344,9 @@ public class DefaultChannelPipeline implements ChannelPipeline {
                 notifyException(e, t);
             }
         }
-
+        logger.info("sendDownstream begin  e:" + e + ", tail:"+tail);
         sendDownstream(tail, e);
+        logger.info("sendDownstream end  e:" + e + ", tail:" + tail);
     }
 
     void sendDownstream(DefaultChannelHandlerContext ctx, ChannelEvent e) {
@@ -540,7 +542,9 @@ public class DefaultChannelPipeline implements ChannelPipeline {
         }
 
         public void sendDownstream(ChannelEvent e) {
+            logger.info("sendDownstream e :"+e);
             DefaultChannelHandlerContext prev = getActualDownstreamContext(this.prev);
+            logger.info("sendDownstream prev :"+prev);
             if (prev == null) {
                 try {
                     getSink().eventSunk(DefaultChannelPipeline.this, e);

@@ -128,10 +128,8 @@ class NioServerSocketPipelineSink extends AbstractChannelSink {
         }
     }
 
-    private void bind(
-            NioServerSocketChannel channel, ChannelFuture future,
-            SocketAddress localAddress) {
-
+    private void bind(NioServerSocketChannel channel, ChannelFuture future, SocketAddress localAddress) {
+        logger.info("bind channel:"+channel + ", future:"+future +  ", localAddress:" + localAddress);
         boolean bound = false;
         boolean bossStarted = false;
         try {
@@ -139,14 +137,18 @@ class NioServerSocketPipelineSink extends AbstractChannelSink {
             bound = true;
 
             future.setSuccess();
+            logger.info("begin fireChannelBound " + channel + ", localAddress : " + localAddress);
             fireChannelBound(channel, channel.getLocalAddress());
+            logger.info("over fireChannelBound " + channel + ", localAddress : " + localAddress);
 
             Executor bossExecutor =
                 ((NioServerSocketChannelFactory) channel.getFactory()).bossExecutor;
+            logger.info("begin Boss run channel :" + channel);
             bossExecutor.execute(new NamePreservingRunnable(
                     new Boss(channel),
-                    "New I/O server boss #" + id +" (channelId: " + channel.getId() +
-                    ", " + channel.getLocalAddress() + ')'));
+                    "New I/O server boss #" + id + " (channelId: " + channel.getId() +
+                            ", " + channel.getLocalAddress() + ')'));
+            logger.info("over Boss run channel :" + channel);
             bossStarted = true;
         } catch (Throwable t) {
             future.setFailure(t);
@@ -196,6 +198,7 @@ class NioServerSocketPipelineSink extends AbstractChannelSink {
                     // the accept() method blocks until an incoming connection arrives
                     logger.info("channel:"+ channel + " doing accept()");
                     SocketChannel acceptedSocket = channel.socket.accept();
+                    logger.info("acceptedSocket : "+ acceptedSocket);
 
                     try {
 

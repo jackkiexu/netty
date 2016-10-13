@@ -132,7 +132,7 @@ public class ServerBootstrap extends Bootstrap {
                 ChannelStateEvent evt) {
             evt.getChannel().getConfig().setPipelineFactory(getPipelineFactory());
 
-            logger.info("channelOpen :" + ctx + ", evt:" + evt);
+            logger.info("Binder channelOpen :" + ctx + ", evt:" + evt);
 
             // Split options into two categories: parent and child.
             Map<String, Object> allOptions = getOptions();
@@ -150,8 +150,13 @@ public class ServerBootstrap extends Bootstrap {
             // Apply parent options.
             evt.getChannel().getConfig().setOptions(parentOptions);
 
-            futureQueue.offer(evt.getChannel().bind(localAddress));
+            logger.info("bind begin evt : " + evt + ", bind : " + localAddress + "");
+            ChannelFuture channelFuture = evt.getChannel().bind(localAddress);
+            logger.info("bind end evt : " + evt + ", bind : " + localAddress + " , channelFuture : " + channelFuture);
+
+            futureQueue.offer(channelFuture);
             ctx.sendUpstream(evt);
+            logger.info("Binder channelOpen over :" + ctx + ", evt:" + evt);
         }
 
         @Override
