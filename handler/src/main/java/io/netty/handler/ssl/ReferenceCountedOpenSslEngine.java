@@ -272,7 +272,7 @@ public class ReferenceCountedOpenSslEngine extends SSLEngine implements Referenc
         apn = (OpenSslApplicationProtocolNegotiator) context.applicationProtocolNegotiator();
         ssl = SSL.newSSL(context.ctx, !context.isClient());
         session = new OpenSslSession(context.sessionContext());
-        networkBIO = SSL.makeNetworkBIO(ssl, context.getMaxBioSize());
+        networkBIO = SSL.makeNetworkBIO(ssl, context.getMaxBioBytes());
         clientMode = context.isClient();
         engineMap = context.engineMap;
         rejectRemoteInitiatedRenegation = context.getRejectRemoteInitiatedRenegotiation();
@@ -435,7 +435,7 @@ public class ReferenceCountedOpenSslEngine extends SSLEngine implements Referenc
                 }
 
                 netWrote = SSL.writeToBIO(networkBIO, addr, len);
-                if (netWrote >= 0) {
+                if (netWrote > 0) {
                     src.position(pos + netWrote);
                     return netWrote;
                 } else {
@@ -545,7 +545,7 @@ public class ReferenceCountedOpenSslEngine extends SSLEngine implements Referenc
 
     private void checkRetryBioOperation(String operation) throws SSLException {
         if (!SSL.shouldRetryBIO(networkBIO)) {
-            // The BIO operation did return <= 0 but we should not retry. Something is seriously wrong
+            // The BIO operation returned <= 0 but we should not retry. Something is seriously wrong
             // so just shutdown with an error.
             throw shutdownWithError(operation);
         }
@@ -640,9 +640,11 @@ public class ReferenceCountedOpenSslEngine extends SSLEngine implements Referenc
                                 // This means the connection was shutdown correctly, close inbound and outbound
                                 if (!receivedShutdown) {
                                     closeAll();
+
+                                    // Check to see if the engine wrote data into the network BIO as closeAll() may
+                                    // produce an alert.
+                                    pendingNet = SSL.pendingWrittenBytesInBIO(networkBIO);
                                 }
-                                // Check to see if the engine wrote data into the network BIO
-                                pendingNet = SSL.pendingWrittenBytesInBIO(networkBIO);
 
                                 return pendingNet > 0 ?
                                         readPendingBytesFromBIO(dst, bytesConsumed, bytesProduced, pendingNet, status) :
@@ -707,12 +709,6 @@ public class ReferenceCountedOpenSslEngine extends SSLEngine implements Referenc
                     }
                 }
             }
-
-            // We need to check if pendingWrittenBytesInBIO was checked yet, as we may not checked if the srcs was
-            // empty, or only contained empty buffers.
-            if (bytesConsumed == 0 && (pendingNet = SSL.pendingWrittenBytesInBIO(networkBIO)) > 0) {
-                return readPendingBytesFromBIO(dst, 0, bytesProduced, pendingNet, status);
-            }
             return newResult(wrapStatus(), bytesConsumed, bytesProduced, status);
         }
     }
@@ -724,9 +720,8 @@ public class ReferenceCountedOpenSslEngine extends SSLEngine implements Referenc
         if (isOutboundDone()) {
             shutdown();
             return CLOSED;
-        } else {
-            return OK;
         }
+        return OK;
     }
 
     /**
@@ -904,13 +899,11 @@ public class ReferenceCountedOpenSslEngine extends SSLEngine implements Referenc
                             if (!dst.hasRemaining()) {
                                 // Move to the next dst buffer as this one is full.
                                 dstsOffset++;
+                            } else if (packetLength == 0) {
+                                // We read everything return now.
+                                return newResult(
+                                        isInboundDone() ? CLOSED : OK, bytesConsumed, bytesProduced, status);
                             } else {
-                                if (packetLength == 0) {
-                                    // We read everything return now.
-                                    return newResult(
-                                            isInboundDone() ? CLOSED : OK, bytesConsumed, bytesProduced, status);
-                                }
-
                                 // try to write again to the BIO, so stop reading from it by break out of the readLoop.
                                 break;
                             }
