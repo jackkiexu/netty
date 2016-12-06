@@ -22,6 +22,7 @@ import io.netty.util.ReferenceCounted;
 import io.netty.util.ResourceLeakDetector;
 import io.netty.util.ResourceLeakDetectorFactory;
 import io.netty.util.ResourceLeakTracker;
+import io.netty.util.internal.ObjectUtil;
 import io.netty.util.internal.PlatformDependent;
 import io.netty.util.internal.StringUtil;
 import io.netty.util.internal.SystemPropertyUtil;
@@ -86,6 +87,15 @@ public abstract class ReferenceCountedOpenSslContext extends SslContext implemen
                     return SystemPropertyUtil.getBoolean("jdk.tls.rejectClientInitiatedRenegotiation", false);
                 }
             });
+
+    private static final int MAX_BIO_SIZE =
+            AccessController.doPrivileged(new PrivilegedAction<Integer>() {
+                @Override
+                public Integer run() {
+                    return Math.min(0, SystemPropertyUtil.getInt("io.netty.handler.ssl.openssl.maxBioSize", 0));
+                }
+            });
+
     private static final List<String> DEFAULT_CIPHERS;
     private static final Integer DH_KEY_LENGTH;
     private static final ResourceLeakDetector<ReferenceCountedOpenSslContext> leakDetector =
@@ -132,7 +142,8 @@ public abstract class ReferenceCountedOpenSslContext extends SslContext implemen
     final Certificate[] keyCertChain;
     final ClientAuth clientAuth;
     final OpenSslEngineMap engineMap = new DefaultOpenSslEngineMap();
-    volatile boolean rejectRemoteInitiatedRenegotiation;
+    private volatile boolean rejectRemoteInitiatedRenegotiation;
+    private volatile int maxBioSize = MAX_BIO_SIZE;
 
     static final OpenSslApplicationProtocolNegotiator NONE_PROTOCOL_NEGOTIATOR =
             new OpenSslApplicationProtocolNegotiator() {
@@ -429,6 +440,29 @@ public abstract class ReferenceCountedOpenSslContext extends SslContext implemen
      */
     public void setRejectRemoteInitiatedRenegotiation(boolean rejectRemoteInitiatedRenegotiation) {
         this.rejectRemoteInitiatedRenegotiation = rejectRemoteInitiatedRenegotiation;
+    }
+
+    /**
+     * Returns if remote initiated renegotiation is supported or not.
+     */
+    public boolean getRejectRemoteInitiatedRenegotiation() {
+         return rejectRemoteInitiatedRenegotiation;
+    }
+
+    /**
+     * Set the maximum number of bytes that are used for each BIO instance used in the pair. As two BIO instances are
+     * needed each {@link ReferenceCountedOpenSslEngine} will consume 2 * maxBioSize of native memory. Using {@code 0}
+     * will use the default value of 16 kb. Using a lower number will trade memory usage with higher cpu-usage.
+     */
+    public void setMaxBioSize(int maxBioSize) {
+        this.maxBioSize = ObjectUtil.checkPositiveOrZero(maxBioSize, "maxBioSize");
+    }
+
+    /**
+     * Returns the maximum number of bytes that are used for each BIO instance.
+     */
+    public int getMaxBioSize() {
+        return maxBioSize;
     }
 
     /**
