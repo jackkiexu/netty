@@ -57,6 +57,7 @@ public abstract class HttpObjectEncoder<H extends HttpMessage> extends MessageTo
     private static final int ST_INIT = 0;
     private static final int ST_CONTENT_NON_CHUNK = 1;
     private static final int ST_CONTENT_CHUNK = 2;
+    private static final int ST_CONTENT_ALWAYS_EMPTY = 3;
 
     @SuppressWarnings("RedundantFieldInitialization")
     private int state = ST_INIT;
@@ -77,7 +78,8 @@ public abstract class HttpObjectEncoder<H extends HttpMessage> extends MessageTo
             encodeInitialLine(buf, m);
             encodeHeaders(m.headers(), buf);
             buf.writeBytes(CRLF);
-            state = HttpUtil.isTransferEncodingChunked(m) ? ST_CONTENT_CHUNK : ST_CONTENT_NON_CHUNK;
+            state = isContentAlwaysEmpty(m) ? ST_CONTENT_ALWAYS_EMPTY :
+                    HttpUtil.isTransferEncodingChunked(m) ? ST_CONTENT_CHUNK : ST_CONTENT_NON_CHUNK;
         }
 
         // Bypass the encoder in case of an empty buffer, so that the following idiom works:
@@ -95,6 +97,14 @@ public abstract class HttpObjectEncoder<H extends HttpMessage> extends MessageTo
 
             if (state == ST_INIT) {
                 throw new IllegalStateException("unexpected message type: " + StringUtil.simpleClassName(msg));
+            }
+
+            if (state == ST_CONTENT_ALWAYS_EMPTY) {
+                out.add(EMPTY_BUFFER);
+                if (msg instanceof LastHttpContent) {
+                    state = ST_INIT;
+                }
+                return;
             }
 
             final long contentLength = contentLength(msg);
@@ -185,6 +195,10 @@ public abstract class HttpObjectEncoder<H extends HttpMessage> extends MessageTo
                 out.add(EMPTY_BUFFER);
             }
         }
+    }
+
+    boolean isContentAlwaysEmpty(@SuppressWarnings("unused") H msg) {
+        return false;
     }
 
     @Override
