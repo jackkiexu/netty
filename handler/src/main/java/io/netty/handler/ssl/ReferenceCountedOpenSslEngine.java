@@ -830,6 +830,11 @@ public class ReferenceCountedOpenSslEngine extends SSLEngine implements Referenc
                 throw new NotSslRecordException("not an SSL/TLS record");
             }
 
+            // IMPORTANT:
+            //
+            // This calculation only works as we not support compression and set
+            // SSL_OP_NO_COMPRESSION in ReferenceCountedOpenSslContext. If compression is supported
+            // it may be possible that the plaintext length is > then the packet length.
             if (packetLength - SslUtils.SSL_RECORD_HEADER_LENGTH > capacity) {
                 // No enough space in the destination buffer so signal the caller
                 // that the buffer needs to be increased.
