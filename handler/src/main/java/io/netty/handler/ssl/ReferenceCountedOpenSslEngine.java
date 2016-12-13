@@ -830,7 +830,7 @@ public class ReferenceCountedOpenSslEngine extends SSLEngine implements Referenc
 
             // IMPORTANT:
             //
-            // This calculation only works as we not support compression and set
+            // This calculation only works as we do not support compression and set
             // SSL_OP_NO_COMPRESSION in ReferenceCountedOpenSslContext. If compression is supported
             // it may be possible that the plaintext length is > then the packet length.
             if (packetLength - SslUtils.SSL_RECORD_HEADER_LENGTH > capacity) {
